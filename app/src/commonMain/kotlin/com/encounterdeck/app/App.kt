@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,26 +38,37 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
+import com.encounterdeck.engine.Difficulty
+import com.encounterdeck.engine.EncounterCard
+import com.encounterdeck.engine.EncounterGenerator
+import com.encounterdeck.engine.EncounterRequest
+import com.encounterdeck.engine.EncounterType
+import com.encounterdeck.engine.InMemoryMonsterRepository
+import com.encounterdeck.engine.Location
+import com.encounterdeck.engine.MonsterGroup
+import com.encounterdeck.engine.Treasure
+import com.encounterdeck.engine.countLabel
 import kotlinx.coroutines.launch
+import kotlin.math.round
 
 private const val ATTRIBUTION =
     "This is a play aid for 5e-compatible games developed by Matthew Heusser (matt@xndev.com)."
 
+private val DIFFICULTIES = listOf("explorer", "balanced", "tactician", "honour")
 private val LOCATIONS = listOf("any", "castle", "dungeon", "woods", "trail", "mountains", "water")
 
-fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "EncounterDeck") {
-        MaterialTheme(colorScheme = darkColorScheme()) {
-            App()
+@Composable
+fun App() {
+    MaterialTheme(colorScheme = darkColorScheme()) {
+        Surface(Modifier.fillMaxSize()) {
+            EncounterScreen()
         }
     }
 }
 
 @Composable
-private fun App() {
-    val api = remember { ApiClient() }
+private fun EncounterScreen() {
+    val generator = remember { EncounterGenerator(InMemoryMonsterRepository()) }
     val scope = rememberCoroutineScope()
 
     var level by remember { mutableStateOf(3) }
@@ -64,78 +76,79 @@ private fun App() {
     var difficulty by remember { mutableStateOf("balanced") }
     var location by remember { mutableStateOf("any") }
 
-    var card by remember { mutableStateOf<CardResponse?>(null) }
+    var card by remember { mutableStateOf<EncounterCard?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
-    var loading by remember { mutableStateOf(false) }
+    var busy by remember { mutableStateOf(false) }
     val rotation = remember { Animatable(0f) }
 
     fun generate() {
-        if (loading) return
+        if (busy) return
         scope.launch {
-            loading = true
+            busy = true
             error = null
-            rotation.animateTo(90f, tween(220))   // turn the current card edge-on
+            rotation.animateTo(90f, tween(220))     // turn the current card edge-on
             try {
-                card = api.generate(level, players, difficulty, location)
+                val diff = Difficulty.valueOf(difficulty.uppercase())
+                val loc = if (location == "any") null else Location.valueOf(location.uppercase())
+                card = generator.generate(
+                    EncounterRequest(level, players, diff, EncounterType.WANDERING, loc)
+                )
             } catch (e: Exception) {
-                error = e.message ?: "Could not reach the backend at localhost:8080"
+                error = e.message ?: "Could not generate an encounter"
                 card = null
             }
-            rotation.animateTo(0f, tween(220))     // turn the new card into view
-            loading = false
+            rotation.animateTo(0f, tween(220))       // turn the new card into view
+            busy = false
         }
     }
 
-    Surface(Modifier.fillMaxSize()) {
-        Column(
-            Modifier.fillMaxSize().padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+    Column(
+        Modifier.fillMaxSize().safeContentPadding().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text("EncounterDeck", style = MaterialTheme.typography.headlineMedium)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            ATTRIBUTION,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(16.dp))
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            LabeledDropdown("Level", (1..10).toList(), level) { level = it }
+            LabeledDropdown("Players", (1..8).toList(), players) { players = it }
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            LabeledDropdown("Difficulty", DIFFICULTIES, difficulty) { difficulty = it }
+            LabeledDropdown("Location", LOCATIONS, location) { location = it }
+        }
+
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = { generate() }, enabled = !busy) {
+            Text(if (busy) "Generating…" else "Generate")
+        }
+
+        Spacer(Modifier.height(20.dp))
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .graphicsLayer {
+                    rotationY = rotation.value
+                    cameraDistance = 16f * density
+                },
+            contentAlignment = Alignment.Center,
         ) {
-            Text("EncounterDeck", style = MaterialTheme.typography.headlineMedium)
-            Spacer(Modifier.height(4.dp))
-            Text(
-                ATTRIBUTION,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(20.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Dropdown("Party level", (1..10).toList(), level) { level = it }
-                Dropdown("Players", (1..8).toList(), players) { players = it }
-                Dropdown(
-                    "Difficulty",
-                    listOf("explorer", "balanced", "tactician", "honour"),
-                    difficulty,
-                ) { difficulty = it }
-                Dropdown("Location", LOCATIONS, location) { location = it }
-            }
-
-            Spacer(Modifier.height(20.dp))
-            Button(onClick = { generate() }, enabled = !loading) {
-                Text(if (loading) "Generating…" else "Generate")
-            }
-
-            Spacer(Modifier.height(24.dp))
-            Box(
-                Modifier
-                    .width(420.dp)
-                    .height(460.dp)
-                    .graphicsLayer {
-                        rotationY = rotation.value
-                        cameraDistance = 16f * density
-                    },
-                contentAlignment = Alignment.Center,
-            ) {
-                CardFace(card, error)
-            }
+            CardFace(card, error)
         }
     }
 }
 
 @Composable
-private fun <T> Dropdown(label: String, options: List<T>, selected: T, onSelect: (T) -> Unit) {
+private fun <T> LabeledDropdown(label: String, options: List<T>, selected: T, onSelect: (T) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(label, style = MaterialTheme.typography.labelMedium)
@@ -160,14 +173,14 @@ private fun <T> Dropdown(label: String, options: List<T>, selected: T, onSelect:
 }
 
 @Composable
-private fun CardFace(card: CardResponse?, error: String?) {
+private fun CardFace(card: EncounterCard?, error: String?) {
     Surface(
         Modifier.fillMaxSize().clip(RoundedCornerShape(20.dp)),
         color = MaterialTheme.colorScheme.surfaceVariant,
         tonalElevation = 6.dp,
         shadowElevation = 10.dp,
     ) {
-        Box(Modifier.padding(24.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.padding(20.dp), contentAlignment = Alignment.Center) {
             when {
                 error != null -> Text(
                     "⚠️  $error",
@@ -185,30 +198,31 @@ private fun CardFace(card: CardResponse?, error: String?) {
 }
 
 @Composable
-private fun CardContent(card: CardResponse) {
+private fun CardContent(card: EncounterCard) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        card.monsters.forEach { m ->
+        card.groups.forEach { group ->
+            val m = group.monster
             Text(
-                m.label,
+                countLabel(m.name, group.count),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "CR ${m.cr}   •   AC ${m.ac}   •   ${m.size} ${m.type}",
+                "CR ${formatCr(m.cr)}   •   AC ${m.ac}   •   ${m.size} ${m.type}",
                 style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                "HP (${m.hitDice}):  ${m.hitPoints.joinToString(", ")}",
+                "HP (${m.hitDice}):  ${group.hitPoints.joinToString(", ")}",
                 style = MaterialTheme.typography.bodyMedium,
             )
 
-            immunitiesLine(m)?.let {
+            immunitiesLine(group)?.let {
                 Spacer(Modifier.height(6.dp))
                 Text(
                     it,
@@ -242,8 +256,8 @@ private fun CardContent(card: CardResponse) {
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            "Power ${card.power}  •  party ${card.partyLevel}, ${card.numPlayers} players, " +
-                "${card.difficulty}, ${card.location}",
+            "Power ${formatPower(card.power)}  •  party ${card.partyLevel}, " +
+                "${card.numPlayers} players, ${card.difficulty.name.lowercase()}",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -251,7 +265,8 @@ private fun CardContent(card: CardResponse) {
     }
 }
 
-private fun immunitiesLine(m: MonsterGroupResp): String? {
+private fun immunitiesLine(group: MonsterGroup): String? {
+    val m = group.monster
     val parts = buildList {
         if (m.damageImmunities.isNotEmpty()) add("Immune (damage): ${m.damageImmunities.joinToString(", ")}")
         if (m.conditionImmunities.isNotEmpty()) add("Immune (condition): ${m.conditionImmunities.joinToString(", ")}")
@@ -259,7 +274,19 @@ private fun immunitiesLine(m: MonsterGroupResp): String? {
     return if (parts.isEmpty()) null else parts.joinToString("\n")
 }
 
-private fun formatTreasure(t: TreasureResp): String {
+private fun formatCr(cr: Double): String = when (cr) {
+    0.125 -> "1/8"
+    0.25 -> "1/4"
+    0.5 -> "1/2"
+    else -> cr.toInt().toString()
+}
+
+private fun formatPower(power: Double): String {
+    val rounded = round(power * 100) / 100.0
+    return rounded.toString()
+}
+
+private fun formatTreasure(t: Treasure): String {
     val parts = buildList {
         if (t.pp > 0) add("${t.pp} pp")
         if (t.gp > 0) add("${t.gp} gp")

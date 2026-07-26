@@ -1,25 +1,26 @@
 plugins {
-    kotlin("jvm")
-    application
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation(kotlin("test"))
+    kotlin("multiplatform")
+    id("com.android.library")
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvm()               // used by the Ktor backend
+    androidTarget()     // used by the Android app
+    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
+        target.binaries.framework { baseName = "engine" }
+    }
+
+    sourceSets {
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+    }
 }
 
-application {
-    // A tiny runnable demo so we can eyeball generated cards from the terminal.
-    mainClass.set("com.encounterdeck.engine.DemoKt")
-}
-
-tasks.test {
-    useJUnitPlatform()
+android {
+    namespace = "com.encounterdeck.engine"
+    compileSdk = 35
+    defaultConfig {
+        minSdk = 26
+    }
 }

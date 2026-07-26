@@ -4,10 +4,6 @@ plugins {
     application
 }
 
-repositories {
-    mavenCentral()
-}
-
 val ktorVersion = "3.2.0"
 
 dependencies {
