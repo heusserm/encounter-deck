@@ -131,4 +131,4 @@ Next: Phase 1 (all tiers polished, full monster seed, environment-tag filtering)
 
 ## License
 
-This app is released under the **MIT License** — see [LICENSE](LICENSE).
+Released under the [PolyForm Noncommercial License 1.0.0](LICENSE): you may use, run, modify, and share this software for any noncommercial purpose, and contributions are welcome — but commercial use, including selling it, is not permitted.
