@@ -6,6 +6,11 @@ party level, party size, difficulty,
 and encounter type, hit **Generate**, and get a scaled encounter with stats, XP,
 and treasure.
 
+It is a play aid for 5e-compatible games.
+
+**Author:** Matthew Heusser — matt@xndev.com
+Written by Matthew Heusser with help from Claude Code.
+
 ---
 
 ## Decisions (locked)
@@ -123,3 +128,7 @@ curl "http://localhost:8080/generate?partyLevel=3&numPlayers=4&difficulty=tactic
 - ✅ `app/` — Compose desktop UI with dropdowns + card-flip, wired to the backend
 
 Next: Phase 1 (all tiers polished, full monster seed, environment-tag filtering).
+
+## License
+
+This app is released under the **MIT License** — see [LICENSE](LICENSE).
