@@ -92,6 +92,34 @@ EncounterDeck/
 
 ---
 
+## Running the POC
+
+Requires JDK 21 (the Gradle wrapper handles Gradle/Kotlin/Compose).
+
+```bash
+# 1. Start the backend API (serves http://localhost:8080/generate)
+./gradlew :backend:run
+
+# 2. In a second terminal, launch the desktop app (calls the backend)
+./gradlew :app:run
+
+# Other handy commands
+./gradlew :engine:run    # print sample cards to the terminal (no server needed)
+./gradlew build          # compile everything + run all tests
+```
+
+Example API call:
+
+```bash
+curl "http://localhost:8080/generate?partyLevel=3&numPlayers=4&difficulty=tactician"
+```
+
 ## Status
 
-Scoping complete. Phase 0 not yet started.
+**Phase 0 (POC) complete** — all three layers built, tested, and verified live:
+
+- ✅ `engine/` — pure-Kotlin generator + domain model, 11 unit tests
+- ✅ `backend/` — Ktor `GET /generate` → JSON, 5 endpoint tests
+- ✅ `app/` — Compose desktop UI with dropdowns + card-flip, wired to the backend
+
+Next: Phase 1 (all tiers polished, full monster seed, environment-tag filtering).
