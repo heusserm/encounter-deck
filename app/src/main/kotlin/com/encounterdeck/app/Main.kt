@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -32,10 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.launch
+
+private const val ATTRIBUTION =
+    "This is a play aid for 5e-compatible games developed by Matthew Heusser (matt@xndev.com)."
+
+private val LOCATIONS = listOf("any", "castle", "dungeon", "woods", "trail", "mountains", "water")
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "EncounterDeck") {
@@ -53,6 +62,7 @@ private fun App() {
     var level by remember { mutableStateOf(3) }
     var players by remember { mutableStateOf(4) }
     var difficulty by remember { mutableStateOf("balanced") }
+    var location by remember { mutableStateOf("any") }
 
     var card by remember { mutableStateOf<CardResponse?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -66,7 +76,7 @@ private fun App() {
             error = null
             rotation.animateTo(90f, tween(220))   // turn the current card edge-on
             try {
-                card = api.generate(level, players, difficulty, "wandering")
+                card = api.generate(level, players, difficulty, location)
             } catch (e: Exception) {
                 error = e.message ?: "Could not reach the backend at localhost:8080"
                 card = null
@@ -82,6 +92,13 @@ private fun App() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text("EncounterDeck", style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(4.dp))
+            Text(
+                ATTRIBUTION,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
             Spacer(Modifier.height(20.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -92,6 +109,7 @@ private fun App() {
                     listOf("explorer", "balanced", "tactician", "honour"),
                     difficulty,
                 ) { difficulty = it }
+                Dropdown("Location", LOCATIONS, location) { location = it }
             }
 
             Spacer(Modifier.height(20.dp))
@@ -99,11 +117,11 @@ private fun App() {
                 Text(if (loading) "Generating…" else "Generate")
             }
 
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(24.dp))
             Box(
                 Modifier
-                    .width(380.dp)
-                    .height(440.dp)
+                    .width(420.dp)
+                    .height(460.dp)
                     .graphicsLayer {
                         rotationY = rotation.value
                         cameraDistance = 16f * density
@@ -168,38 +186,77 @@ private fun CardFace(card: CardResponse?, error: String?) {
 
 @Composable
 private fun CardContent(card: CardResponse) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            card.type.uppercase(),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Spacer(Modifier.height(12.dp))
+    Column(
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         card.monsters.forEach { m ->
             Text(
-                "${m.count} × ${m.name}",
+                m.label,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "CR ${m.cr}   •   AC ${m.ac}   •   HP ${m.hp} each",
+                "CR ${m.cr}   •   AC ${m.ac}   •   ${m.size} ${m.type}",
                 style = MaterialTheme.typography.bodyMedium,
             )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                "HP (${m.hitDice}):  ${m.hitPoints.joinToString(", ")}",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
+            immunitiesLine(m)?.let {
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    textAlign = TextAlign.Center,
+                )
+            }
+
+            if (m.attacks.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                m.attacks.forEach { attack ->
+                    Text(
+                        "• $attack",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                    )
+                }
+            }
         }
-        Spacer(Modifier.height(20.dp))
+
+        Spacer(Modifier.height(16.dp))
         HorizontalDivider()
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(16.dp))
         Text("XP  ${card.totalXp}", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(6.dp))
-        Text("Treasure  ${formatTreasure(card.treasure)}", style = MaterialTheme.typography.bodyMedium)
-        Spacer(Modifier.height(20.dp))
         Text(
-            "Power ${card.power}  •  party ${card.partyLevel}, ${card.numPlayers} players, ${card.difficulty}",
+            "Treasure  ${formatTreasure(card.treasure)}",
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(16.dp))
+        Text(
+            "Power ${card.power}  •  party ${card.partyLevel}, ${card.numPlayers} players, " +
+                "${card.difficulty}, ${card.location}",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
     }
+}
+
+private fun immunitiesLine(m: MonsterGroupResp): String? {
+    val parts = buildList {
+        if (m.damageImmunities.isNotEmpty()) add("Immune (damage): ${m.damageImmunities.joinToString(", ")}")
+        if (m.conditionImmunities.isNotEmpty()) add("Immune (condition): ${m.conditionImmunities.joinToString(", ")}")
+    }
+    return if (parts.isEmpty()) null else parts.joinToString("\n")
 }
 
 private fun formatTreasure(t: TreasureResp): String {

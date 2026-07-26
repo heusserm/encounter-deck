@@ -8,9 +8,9 @@ fun main() {
 
     val requests = listOf(
         EncounterRequest(partyLevel = 1, numPlayers = 4, difficulty = Difficulty.BALANCED),
-        EncounterRequest(partyLevel = 3, numPlayers = 4, difficulty = Difficulty.TACTICIAN),
-        EncounterRequest(partyLevel = 3, numPlayers = 6, difficulty = Difficulty.HONOUR),
-        EncounterRequest(partyLevel = 5, numPlayers = 4, difficulty = Difficulty.EXPLORER),
+        EncounterRequest(partyLevel = 2, numPlayers = 4, difficulty = Difficulty.TACTICIAN, location = Location.WATER),
+        EncounterRequest(partyLevel = 3, numPlayers = 6, difficulty = Difficulty.HONOUR, location = Location.DUNGEON),
+        EncounterRequest(partyLevel = 4, numPlayers = 4, difficulty = Difficulty.EXPLORER, location = Location.CASTLE),
         EncounterRequest(partyLevel = 8, numPlayers = 5, difficulty = Difficulty.BALANCED),
     )
 
@@ -20,24 +20,32 @@ fun main() {
 }
 
 private fun printCard(card: EncounterCard, request: EncounterRequest) {
-    println("=".repeat(56))
+    val where = request.location?.name?.lowercase() ?: "anywhere"
+    println("=".repeat(60))
     println(
         "Party level ${request.partyLevel}, ${request.numPlayers} players, " +
-            "${request.difficulty.name.lowercase()}  (${request.type.name.lowercase()})"
+            "${request.difficulty.name.lowercase()}  ($where)"
     )
-    println(
-        "Power ${"%.2f".format(card.power)}  " +
-            "(roll ${"%.2f".format(card.difficultyRoll)})"
-    )
+    println("Power ${"%.2f".format(card.power)}  (roll ${"%.2f".format(card.difficultyRoll)})")
     for (group in card.groups) {
         val m = group.monster
-        println(
-            "  ${group.count}x ${m.name}  " +
-                "CR ${formatCr(m.cr)}, AC ${m.ac}, HP ${m.hp} each"
-        )
+        println("  ${countLabel(m.name, group.count)}  —  CR ${formatCr(m.cr)}, AC ${m.ac}")
+        println("    HP (${m.hitDice}): ${group.hitPoints.joinToString(", ")}")
+        immunitiesLine(m)?.let { println("    Immunities: $it") }
+        if (m.attacks.isNotEmpty()) {
+            m.attacks.forEach { println("    • $it") }
+        }
     }
     println("  XP total: ${card.totalXp}")
     println("  Treasure: ${formatTreasure(card.treasure)}")
+}
+
+private fun immunitiesLine(m: Monster): String? {
+    val parts = buildList {
+        if (m.damageImmunities.isNotEmpty()) add("damage — ${m.damageImmunities.joinToString(", ")}")
+        if (m.conditionImmunities.isNotEmpty()) add("condition — ${m.conditionImmunities.joinToString(", ")}")
+    }
+    return if (parts.isEmpty()) null else parts.joinToString("; ")
 }
 
 private fun formatCr(cr: Double): String = when (cr) {

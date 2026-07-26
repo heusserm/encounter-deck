@@ -2,6 +2,7 @@ package com.encounterdeck.backend
 
 import com.encounterdeck.engine.EncounterCard
 import com.encounterdeck.engine.Treasure
+import com.encounterdeck.engine.countLabel
 import kotlinx.serialization.Serializable
 
 /**
@@ -14,6 +15,7 @@ data class GenerateResponse(
     val numPlayers: Int,
     val difficulty: String,
     val type: String,
+    val location: String,
     val difficultyRoll: Double,
     val power: Double,
     val totalMonsters: Int,
@@ -26,12 +28,18 @@ data class GenerateResponse(
 data class MonsterGroupDto(
     val count: Int,
     val name: String,
+    val label: String,
     val cr: String,
     val ac: Int,
-    val hp: Int,
+    val hitDice: String,
+    val hitPoints: List<Int>,
     val xp: Int,
     val size: String,
     val type: String,
+    val damageImmunities: List<String>,
+    val conditionImmunities: List<String>,
+    val attacks: List<String>,
+    val locations: List<String>,
 )
 
 @Serializable
@@ -48,25 +56,33 @@ data class TreasureDto(
 data class ErrorResponse(val error: String)
 
 /** Map an engine [EncounterCard] to its JSON response shape. */
-fun EncounterCard.toResponse(): GenerateResponse = GenerateResponse(
+fun EncounterCard.toResponse(location: String): GenerateResponse = GenerateResponse(
     partyLevel = partyLevel,
     numPlayers = numPlayers,
     difficulty = difficulty.name.lowercase(),
     type = type.name.lowercase(),
+    location = location,
     difficultyRoll = roundTo(difficultyRoll, 2),
     power = roundTo(power, 2),
     totalMonsters = totalMonsters,
     totalXp = totalXp,
     monsters = groups.map { group ->
+        val m = group.monster
         MonsterGroupDto(
             count = group.count,
-            name = group.monster.name,
-            cr = formatCr(group.monster.cr),
-            ac = group.monster.ac,
-            hp = group.monster.hp,
-            xp = group.monster.xp,
-            size = group.monster.size,
-            type = group.monster.type,
+            name = m.name,
+            label = countLabel(m.name, group.count),
+            cr = formatCr(m.cr),
+            ac = m.ac,
+            hitDice = m.hitDice.toString(),
+            hitPoints = group.hitPoints,
+            xp = m.xp,
+            size = m.size,
+            type = m.type,
+            damageImmunities = m.damageImmunities,
+            conditionImmunities = m.conditionImmunities,
+            attacks = m.attacks,
+            locations = m.locations.map { it.name.lowercase() }.sorted(),
         )
     },
     treasure = treasure.toDto(),

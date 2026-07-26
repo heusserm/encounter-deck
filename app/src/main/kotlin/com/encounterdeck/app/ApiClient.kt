@@ -22,11 +22,13 @@ class ApiClient(private val baseUrl: String = "http://localhost:8080") {
         partyLevel: Int,
         numPlayers: Int,
         difficulty: String,
-        type: String,
+        location: String,
+        type: String = "wandering",
     ): CardResponse = client.get("$baseUrl/generate") {
         parameter("partyLevel", partyLevel)
         parameter("numPlayers", numPlayers)
         parameter("difficulty", difficulty)
+        parameter("location", location)
         parameter("type", type)
     }.body()
 }

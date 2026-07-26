@@ -58,6 +58,26 @@ class EncounterGeneratorTest {
     }
 
     @Test
+    fun `location filter restricts to monsters tagged for that location`() {
+        val gen = generator(Random(11))
+        repeat(50) {
+            val card = gen.generate(
+                EncounterRequest(2, 4, Difficulty.BALANCED, location = Location.WATER),
+            )
+            val m = card.groups.single().monster
+            assertTrue(Location.WATER in m.locations, "${m.name} is not a WATER monster")
+        }
+    }
+
+    @Test
+    fun `each monster in a group has its own rolled hit points`() {
+        val gen = generator(Random(4))
+        val group = gen.generate(EncounterRequest(1, 6, Difficulty.HONOUR)).groups.single()
+        assertEquals(group.count, group.hitPoints.size)
+        assertTrue(group.hitPoints.all { it >= 1 })
+    }
+
+    @Test
     fun `always at least one monster`() {
         val rng = ScriptedRandom(doubleValue = 0.0, intValue = 0)
         val card = generator(rng).generate(EncounterRequest(1, 1, Difficulty.EXPLORER))

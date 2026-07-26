@@ -37,14 +37,16 @@ class EncounterGenerator(
         val power = request.partyLevel * request.numPlayers * difficultyRoll / 4.0
 
         val targetCr = max(0, request.partyLevel - 1).toDouble()
-        val eligible = monsters.eligible(targetCr, request.type)
+        val eligible = monsters.eligible(targetCr, request.type, request.location)
         require(eligible.isNotEmpty()) {
-            "No eligible monsters for targetCR ~$targetCr, type ${request.type}"
+            "No eligible monsters for targetCR ~$targetCr, type ${request.type}, location ${request.location}"
         }
         val monster = eligible[random.nextInt(eligible.size)]
 
         val count = max(1, (power / monster.cr).roundToInt())
 
+        // Each monster rolls its own hit points, so a group has a spread of HP.
+        val hitPoints = List(count) { monster.hitDice.roll(random) }
         val totalXp = monster.xp * count
         var treasure = Treasure.NONE
         repeat(count) { treasure += TreasureTables.rollIndividual(monster.cr, random) }
@@ -56,7 +58,7 @@ class EncounterGenerator(
             difficulty = tier,
             difficultyRoll = difficultyRoll,
             power = power,
-            groups = listOf(MonsterGroup(monster, count)),
+            groups = listOf(MonsterGroup(monster, hitPoints)),
             totalXp = totalXp,
             treasure = treasure,
         )

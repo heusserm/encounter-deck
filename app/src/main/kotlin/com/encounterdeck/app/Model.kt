@@ -9,6 +9,7 @@ data class CardResponse(
     val numPlayers: Int,
     val difficulty: String,
     val type: String,
+    val location: String,
     val difficultyRoll: Double,
     val power: Double,
     val totalMonsters: Int,
@@ -21,12 +22,18 @@ data class CardResponse(
 data class MonsterGroupResp(
     val count: Int,
     val name: String,
+    val label: String,
     val cr: String,
     val ac: Int,
-    val hp: Int,
+    val hitDice: String,
+    val hitPoints: List<Int>,
     val xp: Int,
     val size: String,
     val type: String,
+    val damageImmunities: List<String>,
+    val conditionImmunities: List<String>,
+    val attacks: List<String>,
+    val locations: List<String>,
 )
 
 @Serializable
