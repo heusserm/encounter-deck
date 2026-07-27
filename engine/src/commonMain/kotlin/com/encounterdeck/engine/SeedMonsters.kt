@@ -1,8 +1,10 @@
 package com.encounterdeck.engine
 
 import com.encounterdeck.engine.Location.CASTLE
+import com.encounterdeck.engine.Location.DESERT
 import com.encounterdeck.engine.Location.DUNGEON
 import com.encounterdeck.engine.Location.MOUNTAINS
+import com.encounterdeck.engine.Location.NORTH
 import com.encounterdeck.engine.Location.TRAIL
 import com.encounterdeck.engine.Location.WATER
 import com.encounterdeck.engine.Location.WOODS
@@ -120,7 +122,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Claw +0 (1 bludgeoning)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "deer",
@@ -165,7 +167,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = emptyList(),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "giant-fire-beetle",
@@ -300,7 +302,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Tentacles +4 (1 bludgeoning)", "Ink Cloud +0"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "owl",
@@ -375,7 +377,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Sting +2 (1 piercing)"),
-            locations = setOf(TRAIL, WOODS),
+            locations = setOf(DESERT),
         ),
         Monster(
             id = "sea-horse",
@@ -495,7 +497,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +5 (1d4 bludgeoning)"),
-            locations = setOf(TRAIL, WOODS),
+            locations = setOf(DESERT),
         ),
         Monster(
             id = "cultist",
@@ -540,7 +542,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Claw +3 (1d6+1 bludgeoning)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "giant-rat",
@@ -615,7 +617,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Dagger +4 (1d4+2 piercing)", "Sling +4 (1d4+2 bludgeoning)"),
-            locations = setOf(DUNGEON, TRAIL),
+            locations = setOf(DUNGEON, TRAIL, WOODS),
         ),
         Monster(
             id = "mastiff",
@@ -645,7 +647,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Spear +2"),
-            locations = setOf(DUNGEON, TRAIL, WATER),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "mule",
@@ -945,7 +947,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +3 (1d6+1 piercing)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "giant-lizard",
@@ -1275,7 +1277,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +4 (1d10+2 piercing)"),
-            locations = setOf(MOUNTAINS, TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "darkmantle",
@@ -1320,7 +1322,7 @@ object SeedMonsters {
             damageImmunities = listOf("poison"),
             conditionImmunities = listOf("poisoned"),
             attacks = listOf("Claws +4 (1d4+2 slashing)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(DESERT),
         ),
         Monster(
             id = "giant-goat",
@@ -1350,7 +1352,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Ram +3 (1d6+1 bludgeoning)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "giant-wasp",
@@ -1425,7 +1427,7 @@ object SeedMonsters {
             damageImmunities = listOf("cold", "poison"),
             conditionImmunities = listOf("poisoned"),
             attacks = listOf("Claws +3 (1d4+1 slashing + 1d4 cold)", "Frost Breath (2d4 cold, DC 10 DEX)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(MOUNTAINS, NORTH),
         ),
         Monster(
             id = "lizardfolk",
@@ -1500,7 +1502,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +4 (1d8+2 piercing)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "rust-monster",
@@ -1530,7 +1532,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("The sahuagin makes two melee attacks: one with its bite and one with its claws or spear", "Bite +3 (1d4+1 piercing)", "Claws +3 (1d4+1 slashing)", "Spear +3"),
-            locations = setOf(DUNGEON, TRAIL, WATER),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "satyr",
@@ -1740,7 +1742,7 @@ object SeedMonsters {
             damageImmunities = listOf("fire"),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +4 (1d10+2 piercing)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(DESERT, DUNGEON, MOUNTAINS),
         ),
         Monster(
             id = "brown-bear",
@@ -1770,7 +1772,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Morningstar +4 (2d8+2 piercing)", "Javelin +4 (2d6+2 piercing)"),
-            locations = setOf(DUNGEON, TRAIL),
+            locations = setOf(DUNGEON, TRAIL, WOODS),
         ),
         Monster(
             id = "copper-dragon-wyrmling",
@@ -1905,7 +1907,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Tentacles +5 (2d6+3 bludgeoning)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "giant-spider",
@@ -1935,7 +1937,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +4 (1d10+2 piercing + 1d10 poison)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "giant-vulture",
@@ -2415,7 +2417,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +6 (2d8+4 piercing)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "merrow",
@@ -2430,7 +2432,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("The merrow makes two attacks: one with its bite and one with its claws or harpoon", "Bite +6 (1d8+4 piercing)", "Claws +6 (2d4+4 slashing)", "Harpoon +6 (2d6+4 piercing)"),
-            locations = setOf(DUNGEON, MOUNTAINS, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "mimic",
@@ -2535,7 +2537,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +6 (3d6+4 piercing)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "polar-bear",
@@ -2550,7 +2552,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("The bear makes two attacks: one with its bite and one with its claws", "Bite +7 (1d8+5 piercing)", "Claws +7 (2d6+5 slashing)"),
-            locations = setOf(TRAIL, WOODS),
+            locations = setOf(MOUNTAINS, NORTH),
         ),
         Monster(
             id = "priest",
@@ -2625,7 +2627,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Claws +5 (2d6+3 slashing)"),
-            locations = setOf(WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "silver-dragon-wyrmling",
@@ -2715,7 +2717,7 @@ object SeedMonsters {
             damageImmunities = listOf("cold"),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +4 (1d10+2 piercing + 1d4 cold)", "Cold Breath (5d8 cold, DC 12 CON)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(DUNGEON, MOUNTAINS, NORTH),
         ),
         Monster(
             id = "will-o-wisp",
@@ -2775,7 +2777,7 @@ object SeedMonsters {
             damageImmunities = listOf("lightning"),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +5 (1d10+3 piercing + 1d6 lightning)", "Lightning Breath (4d10 lightning, DC 12 DEX)"),
-            locations = setOf(DUNGEON, MOUNTAINS, TRAIL),
+            locations = setOf(DESERT, DUNGEON, MOUNTAINS),
         ),
         Monster(
             id = "doppelganger",
@@ -2805,7 +2807,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Claw +4 (1d8+2 bludgeoning)", "The scorpion makes three attacks: two with its claws and one with its sting", "Sting +4 (1d10+2 piercing)"),
-            locations = setOf(TRAIL, WOODS),
+            locations = setOf(DESERT),
         ),
         Monster(
             id = "gold-dragon-wyrmling",
@@ -2865,7 +2867,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +6 (5d6+4 piercing)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "knight",
@@ -2925,7 +2927,7 @@ object SeedMonsters {
             damageImmunities = listOf("necrotic", "poison"),
             conditionImmunities = listOf("charmed", "exhaustion", "frightened", "paralyzed", "poisoned"),
             attacks = listOf("The mummy can use its Dreadful Glare and makes one attack with its rotting fist", "Rotting Fist +5 (2d6+3 bludgeoning + 3d6 necrotic)"),
-            locations = setOf(CASTLE, DUNGEON),
+            locations = setOf(DESERT, DUNGEON),
         ),
         Monster(
             id = "nightmare",
@@ -3060,7 +3062,7 @@ object SeedMonsters {
             damageImmunities = listOf("cold"),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +6 (2d6+4 piercing)", "Cold Breath (4d8 cold, DC 12 DEX)"),
-            locations = setOf(DUNGEON, MOUNTAINS, WOODS),
+            locations = setOf(MOUNTAINS, NORTH),
         ),
         Monster(
             id = "black-pudding",
@@ -3390,7 +3392,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("The crocodile makes two attacks: one with its bite and one with its tail", "Bite +8 (3d10+5 piercing)", "Tail +8 (2d8+5 bludgeoning)"),
-            locations = setOf(MOUNTAINS, TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "giant-shark",
@@ -3405,7 +3407,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +9 (3d10+6 piercing)"),
-            locations = setOf(TRAIL, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "gladiator",
@@ -3435,7 +3437,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = listOf("petrified"),
             attacks = listOf("Gore +8 (2d12+5 piercing)", "Hooves +8 (2d10+5 bludgeoning)"),
-            locations = setOf(DUNGEON, MOUNTAINS, WOODS),
+            locations = setOf(DESERT),
         ),
         Monster(
             id = "half-red-dragon-veteran",
@@ -3525,7 +3527,7 @@ object SeedMonsters {
             damageImmunities = listOf("fire"),
             conditionImmunities = emptyList(),
             attacks = listOf("The salamander makes two attacks: one with its spear and one with its tail", "Spear +7 (1d6 fire)", "Tail +7 (2d6+4 bludgeoning + 2d6 fire)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(DESERT),
         ),
         Monster(
             id = "shambling-mound",
@@ -3615,7 +3617,7 @@ object SeedMonsters {
             damageImmunities = listOf("poison"),
             conditionImmunities = listOf("exhaustion", "grappled", "paralyzed", "petrified", "poisoned", "prone", "restrained", "unconscious"),
             attacks = listOf("The elemental makes two slam attacks", "Slam +7 (2d8+4 bludgeoning)", "Whelm (2d8+4 bludgeoning, DC 15 STR)"),
-            locations = setOf(DUNGEON, MOUNTAINS, WATER),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "werebear-bear",
@@ -3765,7 +3767,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("Gore +10 (4d8+7 piercing)", "Stomp +10 (4d10+7 bludgeoning)"),
-            locations = setOf(TRAIL, WOODS),
+            locations = setOf(MOUNTAINS, NORTH),
         ),
         Monster(
             id = "medusa",
@@ -3825,7 +3827,7 @@ object SeedMonsters {
             damageImmunities = listOf("fire"),
             conditionImmunities = emptyList(),
             attacks = listOf("The dragon makes three attacks: one with its bite and two with its claws", "Bite +7 (2d10+4 piercing)", "Claw +7 (2d6+4 slashing)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(DESERT, DUNGEON, MOUNTAINS),
         ),
         Monster(
             id = "young-white-dragon",
@@ -3840,7 +3842,7 @@ object SeedMonsters {
             damageImmunities = listOf("cold"),
             conditionImmunities = emptyList(),
             attacks = listOf("The dragon makes three attacks: one with its bite and two with its claws", "Bite +7 (2d10+4 piercing + 1d8 cold)", "Claw +7 (2d6+4 slashing)", "Cold Breath (10d8 cold, DC 15 CON)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(DUNGEON, MOUNTAINS, NORTH),
         ),
         Monster(
             id = "giant-ape",
@@ -3990,7 +3992,7 @@ object SeedMonsters {
             damageImmunities = listOf("cold"),
             conditionImmunities = emptyList(),
             attacks = listOf("The giant makes two greataxe attacks", "Greataxe +9 (3d12+6 slashing)", "Rock +9 (4d10+6 bludgeoning)"),
-            locations = setOf(MOUNTAINS, TRAIL),
+            locations = setOf(MOUNTAINS, NORTH),
         ),
         Monster(
             id = "hezrou",
@@ -4020,7 +4022,7 @@ object SeedMonsters {
             damageImmunities = emptyList(),
             conditionImmunities = emptyList(),
             attacks = listOf("The hydra makes as many bite attacks as it has heads", "Bite +8 (1d10+5 piercing)"),
-            locations = setOf(DUNGEON, MOUNTAINS, WATER, WOODS),
+            locations = setOf(WATER),
         ),
         Monster(
             id = "spirit-naga",
@@ -4185,7 +4187,7 @@ object SeedMonsters {
             damageImmunities = listOf("lightning"),
             conditionImmunities = emptyList(),
             attacks = listOf("The dragon makes three attacks: one with its bite and two with its claws", "Bite +9 (2d10+5 piercing + 1d10 lightning)", "Claw +9 (2d6+5 slashing)", "Lightning Breath (10d10 lightning, DC 16 DEX)"),
-            locations = setOf(DUNGEON, MOUNTAINS, TRAIL),
+            locations = setOf(DESERT, DUNGEON, MOUNTAINS),
         ),
         Monster(
             id = "young-silver-dragon",
@@ -4380,7 +4382,7 @@ object SeedMonsters {
             damageImmunities = listOf("cold", "fire"),
             conditionImmunities = emptyList(),
             attacks = listOf("Bite +11 (6d10+7 piercing + 3d6 fire)"),
-            locations = setOf(DUNGEON, MOUNTAINS, WOODS),
+            locations = setOf(MOUNTAINS, NORTH),
         ),
         Monster(
             id = "roc",
@@ -4440,7 +4442,7 @@ object SeedMonsters {
             damageImmunities = listOf("fire"),
             conditionImmunities = emptyList(),
             attacks = listOf("The dragon can use its Frightful Presence", "Bite +11 (2d10+6 piercing)", "Claw +11 (2d6+6 slashing)", "Tail +11 (2d8+6 bludgeoning)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(DESERT, DUNGEON, MOUNTAINS),
         ),
         Monster(
             id = "adult-white-dragon",
@@ -4455,7 +4457,7 @@ object SeedMonsters {
             damageImmunities = listOf("cold"),
             conditionImmunities = emptyList(),
             attacks = listOf("The dragon can use its Frightful Presence", "Bite +11 (2d10+6 piercing + 1d8 cold)", "Claw +11 (2d6+6 slashing)", "Tail +11 (2d8+6 bludgeoning)", "Cold Breath (12d8 cold, DC 19 CON)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(DUNGEON, MOUNTAINS, NORTH),
         ),
         Monster(
             id = "nalfeshnee",
@@ -4635,7 +4637,7 @@ object SeedMonsters {
             damageImmunities = listOf("necrotic", "poison", "bludgeoning, piercing, and slashing from nonmagical weapons"),
             conditionImmunities = listOf("charmed", "exhaustion", "frightened", "paralyzed", "poisoned"),
             attacks = listOf("The mummy can use its Dreadful Glare and makes one attack with its rotting fist", "Rotting Fist +9 (3d6+4 bludgeoning + 6d6 necrotic)"),
-            locations = setOf(CASTLE, DUNGEON),
+            locations = setOf(DESERT, DUNGEON),
         ),
         Monster(
             id = "purple-worm",
@@ -4665,7 +4667,7 @@ object SeedMonsters {
             damageImmunities = listOf("lightning"),
             conditionImmunities = emptyList(),
             attacks = listOf("The dragon can use its Frightful Presence", "Bite +12 (2d10+7 piercing + 1d10 lightning)", "Claw +12 (2d6+7 slashing)", "Tail +12 (2d8+7 bludgeoning)", "Lightning Breath (12d10 lightning, DC 19 DEX)"),
-            locations = setOf(DUNGEON, MOUNTAINS, TRAIL),
+            locations = setOf(DESERT, DUNGEON, MOUNTAINS),
         ),
         Monster(
             id = "adult-silver-dragon",
@@ -4815,7 +4817,7 @@ object SeedMonsters {
             damageImmunities = listOf("fire"),
             conditionImmunities = emptyList(),
             attacks = listOf("The dragon can use its Frightful Presence", "Bite +14 (2d10+8 piercing)", "Claw +14 (2d6+8 slashing)", "Tail +14 (2d8+8 bludgeoning)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(DESERT, DUNGEON, MOUNTAINS),
         ),
         Monster(
             id = "ancient-white-dragon",
@@ -4830,7 +4832,7 @@ object SeedMonsters {
             damageImmunities = listOf("cold"),
             conditionImmunities = emptyList(),
             attacks = listOf("The dragon can use its Frightful Presence", "Bite +14 (2d10+8 piercing + 2d8 cold)", "Claw +14 (2d6+8 slashing)", "Tail +14 (2d8+8 bludgeoning)", "Cold Breath (16d8 cold, DC 22 CON)"),
-            locations = setOf(DUNGEON, MOUNTAINS),
+            locations = setOf(DUNGEON, MOUNTAINS, NORTH),
         ),
         Monster(
             id = "pit-fiend",
@@ -4950,7 +4952,7 @@ object SeedMonsters {
             damageImmunities = listOf("lightning"),
             conditionImmunities = emptyList(),
             attacks = listOf("The dragon can use its Frightful Presence", "Bite +16 (2d10+9 piercing + 2d10 lightning)", "Claw +16 (2d6+9 slashing)", "Tail +16 (2d8+9 bludgeoning)", "Lightning Breath (16d10 lightning, DC 23 DEX)"),
-            locations = setOf(DUNGEON, MOUNTAINS, TRAIL),
+            locations = setOf(DESERT, DUNGEON, MOUNTAINS),
         ),
         Monster(
             id = "ancient-silver-dragon",

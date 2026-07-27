@@ -55,7 +55,8 @@ private const val ATTRIBUTION =
     "This is a play aid for 5e-compatible games developed by Matthew Heusser (matt@xndev.com)."
 
 private val DIFFICULTIES = listOf("explorer", "balanced", "tactician", "honour")
-private val LOCATIONS = listOf("any", "castle", "dungeon", "woods", "trail", "mountains", "water")
+private val LOCATIONS = listOf("any", "castle", "dungeon", "woods", "trail", "mountains", "water", "north", "desert")
+private val TYPES = listOf("wandering", "big bad")
 
 @Composable
 fun App() {
@@ -75,6 +76,7 @@ private fun EncounterScreen() {
     var players by remember { mutableStateOf(4) }
     var difficulty by remember { mutableStateOf("balanced") }
     var location by remember { mutableStateOf("any") }
+    var type by remember { mutableStateOf("wandering") }
 
     var card by remember { mutableStateOf<EncounterCard?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -90,8 +92,9 @@ private fun EncounterScreen() {
             try {
                 val diff = Difficulty.valueOf(difficulty.uppercase())
                 val loc = if (location == "any") null else Location.valueOf(location.uppercase())
+                val encType = if (type == "big bad") EncounterType.BIG_BAD else EncounterType.WANDERING
                 card = generator.generate(
-                    EncounterRequest(level, players, diff, EncounterType.WANDERING, loc)
+                    EncounterRequest(level, players, diff, encType, loc)
                 )
             } catch (e: Exception) {
                 error = e.message ?: "Could not generate an encounter"
@@ -124,6 +127,10 @@ private fun EncounterScreen() {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LabeledDropdown("Difficulty", DIFFICULTIES, difficulty) { difficulty = it }
             LabeledDropdown("Location", LOCATIONS, location) { location = it }
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            LabeledDropdown("Type", TYPES, type) { type = it }
         }
 
         Spacer(Modifier.height(16.dp))

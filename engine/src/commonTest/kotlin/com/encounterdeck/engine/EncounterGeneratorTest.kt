@@ -110,6 +110,30 @@ class EncounterGeneratorTest {
     }
 
     @Test
+    fun `big bad is a single monster tougher than the party`() {
+        val gen = generator(Random(9))
+        repeat(30) {
+            val card = gen.generate(
+                EncounterRequest(3, 4, Difficulty.BALANCED, EncounterType.BIG_BAD),
+            )
+            assertEquals(1, card.totalMonsters)
+            assertTrue(card.groups.single().monster.cr >= 3.0)
+        }
+    }
+
+    @Test
+    fun `harder difficulty yields a tougher big bad`() {
+        val gen = generator(Random(2))
+        val explorer = gen.generate(
+            EncounterRequest(5, 4, Difficulty.EXPLORER, EncounterType.BIG_BAD),
+        ).groups.single().monster.cr
+        val honour = gen.generate(
+            EncounterRequest(5, 4, Difficulty.HONOUR, EncounterType.BIG_BAD),
+        ).groups.single().monster.cr
+        assertTrue(honour > explorer, "honour boss CR $honour should exceed explorer boss CR $explorer")
+    }
+
+    @Test
     fun `rejects invalid input`() {
         val gen = generator(Random(1))
         assertFailsWith<IllegalArgumentException> {

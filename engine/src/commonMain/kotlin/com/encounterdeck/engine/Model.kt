@@ -14,10 +14,14 @@ enum class Difficulty(val minRoll: Double, val maxRoll: Double) {
     HONOUR(1.1, 1.3),
 }
 
-/** The kind of encounter to generate. Only WANDERING is implemented in the POC. */
+/** The kind of encounter to generate. */
 enum class EncounterType {
+    /** A group of same-CR monsters scaled to the party (CR ≈ partyLevel − 1). */
     WANDERING,
-    // ENVIRONMENT, TRAP, BIG_BAD — later phases
+
+    /** A single, tougher solo opponent (CR above the party); no groups. */
+    BIG_BAD,
+    // ENVIRONMENT, TRAP — later phases
 }
 
 /** Where the encounter takes place. Filters which monsters are eligible. */
@@ -28,6 +32,8 @@ enum class Location {
     TRAIL,
     MOUNTAINS,
     WATER,
+    NORTH,   // arctic / frozen
+    DESERT,
 }
 
 /**
