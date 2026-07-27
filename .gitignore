@@ -9,5 +9,10 @@ build/
 *.iws
 local.properties
 
+# iOS / Xcode
+**/xcuserdata/
+DerivedData/
+iosApp/build/
+
 # OS
 .DS_Store
