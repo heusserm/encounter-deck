@@ -29,7 +29,7 @@ class EncounterGeneratorTest {
     }
 
     @Test
-    fun `level 3 party fights CR 2 monsters (partyLevel minus 1)`() {
+    fun `level 3 party fights CR 2 monsters at partyLevel minus 1`() {
         val gen = generator(Random(7))
         repeat(50) {
             val card = gen.generate(EncounterRequest(3, 4, Difficulty.TACTICIAN))
