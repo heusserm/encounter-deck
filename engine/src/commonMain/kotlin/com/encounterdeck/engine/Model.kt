@@ -130,6 +130,7 @@ data class EncounterCard(
     val groups: List<MonsterGroup>,
     val totalXp: Int,
     val treasure: Treasure,
+    val specialLoot: List<String> = emptyList(), // gems, art, potions, magic items
 ) {
     val totalMonsters: Int get() = groups.sumOf { it.count }
 }

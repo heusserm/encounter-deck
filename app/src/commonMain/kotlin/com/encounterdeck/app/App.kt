@@ -221,6 +221,14 @@ private fun CardContent(card: EncounterCard) {
                 "HP (${m.hitDice}):  ${group.hitPoints.joinToString(", ")}",
                 style = MaterialTheme.typography.bodyMedium,
             )
+            m.armor?.let {
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    "Armor: $it (lootable)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
 
             immunitiesLine(group)?.let {
                 Spacer(Modifier.height(6.dp))
@@ -254,6 +262,18 @@ private fun CardContent(card: EncounterCard) {
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
         )
+        if (card.specialLoot.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            card.specialLoot.forEach { item ->
+                Text(
+                    "✦ $item",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                )
+            }
+        }
         Spacer(Modifier.height(16.dp))
         Text(
             "Power ${formatPower(card.power)}  •  party ${card.partyLevel}, " +

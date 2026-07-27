@@ -22,6 +22,7 @@ data class GenerateResponse(
     val totalXp: Int,
     val monsters: List<MonsterGroupDto>,
     val treasure: TreasureDto,
+    val specialLoot: List<String>,
 )
 
 @Serializable
@@ -36,6 +37,7 @@ data class MonsterGroupDto(
     val xp: Int,
     val size: String,
     val type: String,
+    val armor: String?,
     val damageImmunities: List<String>,
     val conditionImmunities: List<String>,
     val attacks: List<String>,
@@ -79,6 +81,7 @@ fun EncounterCard.toResponse(location: String): GenerateResponse = GenerateRespo
             xp = m.xp,
             size = m.size,
             type = m.type,
+            armor = m.armor,
             damageImmunities = m.damageImmunities,
             conditionImmunities = m.conditionImmunities,
             attacks = m.attacks,
@@ -86,6 +89,7 @@ fun EncounterCard.toResponse(location: String): GenerateResponse = GenerateRespo
         )
     },
     treasure = treasure.toDto(),
+    specialLoot = specialLoot,
 )
 
 private fun Treasure.toDto() = TreasureDto(

@@ -50,6 +50,7 @@ class EncounterGenerator(
         val totalXp = monster.xp * count
         var treasure = Treasure.NONE
         repeat(count) { treasure += TreasureTables.rollIndividual(monster.cr, random) }
+        val specialLoot = LootTables.rollSpecialLoot(monster.cr, random)
 
         return EncounterCard(
             type = request.type,
@@ -61,6 +62,7 @@ class EncounterGenerator(
             groups = listOf(MonsterGroup(monster, hitPoints)),
             totalXp = totalXp,
             treasure = treasure,
+            specialLoot = specialLoot,
         )
     }
 }
