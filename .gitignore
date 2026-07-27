@@ -16,3 +16,6 @@ iosApp/build/
 
 # OS
 .DS_Store
+
+# Generated data cache
+scripts/monsters.json

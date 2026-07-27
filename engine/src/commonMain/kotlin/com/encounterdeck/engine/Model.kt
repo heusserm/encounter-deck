@@ -68,6 +68,7 @@ data class Monster(
     val ac: Int,
     val size: String,
     val type: String,
+    val armor: String? = null, // worn (lootable) armor, e.g. "leather armor, shield"; null = natural
     val damageImmunities: List<String> = emptyList(),
     val conditionImmunities: List<String> = emptyList(),
     val attacks: List<String> = emptyList(),
