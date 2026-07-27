@@ -106,39 +106,39 @@ private fun EncounterScreen() {
     }
 
     Column(
-        Modifier.fillMaxSize().safeContentPadding().padding(16.dp),
+        Modifier.fillMaxSize().safeContentPadding().padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("EncounterDeck", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(4.dp))
+        Text("EncounterDeck", style = MaterialTheme.typography.headlineSmall)
+        Spacer(Modifier.height(2.dp))
         Text(
             ATTRIBUTION,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(10.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LabeledDropdown("Level", (1..10).toList(), level) { level = it }
             LabeledDropdown("Players", (1..8).toList(), players) { players = it }
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LabeledDropdown("Difficulty", DIFFICULTIES, difficulty) { difficulty = it }
             LabeledDropdown("Location", LOCATIONS, location) { location = it }
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LabeledDropdown("Type", TYPES, type) { type = it }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(10.dp))
         Button(onClick = { generate() }, enabled = !busy) {
             Text(if (busy) "Generating…" else "Generate")
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(12.dp))
         Box(
             Modifier
                 .fillMaxWidth()
@@ -159,7 +159,7 @@ private fun <T> LabeledDropdown(label: String, options: List<T>, selected: T, on
     var expanded by remember { mutableStateOf(false) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(label, style = MaterialTheme.typography.labelMedium)
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(2.dp))
         Box {
             OutlinedButton(onClick = { expanded = true }) {
                 Text(selected.toString().replaceFirstChar { it.uppercase() })
@@ -187,7 +187,7 @@ private fun CardFace(card: EncounterCard?, error: String?) {
         tonalElevation = 6.dp,
         shadowElevation = 10.dp,
     ) {
-        Box(Modifier.padding(20.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), contentAlignment = Alignment.Center) {
             when {
                 error != null -> Text(
                     "⚠️  $error",
@@ -259,9 +259,9 @@ private fun CardContent(card: EncounterCard) {
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(10.dp))
         HorizontalDivider()
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(10.dp))
         Text("XP  ${card.totalXp}", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(6.dp))
         Text(
@@ -281,7 +281,7 @@ private fun CardContent(card: EncounterCard) {
                 )
             }
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(10.dp))
         Text(
             "Power ${formatPower(card.power)}  •  party ${card.partyLevel}, " +
                 "${card.numPlayers} players, ${card.difficulty.name.lowercase()}",
