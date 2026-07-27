@@ -153,6 +153,25 @@ curl "http://localhost:8080/generate?partyLevel=3&numPlayers=4&difficulty=tactic
 Next: on-device persistence (SQLDelight behind the repository interface), more
 encounter types (traps / big-bad), then cloud sync.
 
+## Game content (SRD 5.1)
+
+This app uses **only open game content from the System Reference Document 5.1
+(SRD 5.1)**. It contains no Product Identity and no closed/edition-specific
+content, and it is not affiliated with, endorsed by, or sponsored by any game
+publisher. It is an independent play aid for 5e-compatible games.
+
+> This work includes material from the System Reference Document 5.1 ("SRD 5.1")
+> by Wizards of the Coast LLC, available under the Creative Commons Attribution
+> 4.0 International License
+> (<https://creativecommons.org/licenses/by/4.0/legalcode>).
+
+Monster data was imported from the community SRD dataset at
+<https://github.com/5e-bits/5e-database> (also SRD 5.1 under CC-BY-4.0).
+
+Note: SRD content (used here under CC-BY-4.0) is distinct from the
+[PolyForm Noncommercial](LICENSE) terms below, which cover **this project's own
+code**.
+
 ## License
 
 Released under the [PolyForm Noncommercial License 1.0.0](LICENSE): you may use, run, modify, and share this software for any noncommercial purpose, and contributions are welcome — but commercial use, including selling it, is not permitted.
