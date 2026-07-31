@@ -52,7 +52,15 @@ import kotlinx.coroutines.launch
 import kotlin.math.round
 
 private const val ATTRIBUTION =
-    "This is a play aid for 5e-compatible games developed by Matthew Heusser (matt@xndev.com)."
+    "This is a play aid for 5e-compatible games developed by Matthew Heusser (matt@xndev.com). " +
+        "Not affiliated with, endorsed by, or sponsored by any game publisher."
+
+// CC-BY-4.0 requires this notice to travel with the distributed work, so it
+// ships in the app rather than only in the repository README.
+private const val SRD_ATTRIBUTION =
+    "This work includes material from the System Reference Document 5.1 (\"SRD 5.1\") " +
+        "by Wizards of the Coast LLC, available under the Creative Commons Attribution " +
+        "4.0 International License (https://creativecommons.org/licenses/by/4.0/legalcode)."
 
 private val DIFFICULTIES = listOf("explorer", "balanced", "tactician", "honour")
 private val LOCATIONS = listOf("any", "castle", "dungeon", "woods", "trail", "mountains", "water", "north", "desert")
@@ -151,6 +159,14 @@ private fun EncounterScreen() {
         ) {
             CardFace(card, error)
         }
+
+        Spacer(Modifier.height(8.dp))
+        Text(
+            SRD_ATTRIBUTION,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
