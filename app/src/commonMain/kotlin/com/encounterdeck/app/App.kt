@@ -37,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.encounterdeck.engine.Difficulty
@@ -182,7 +184,14 @@ private fun <T> LabeledDropdown(label: String, options: List<T>, selected: T, on
         Text(label, style = MaterialTheme.typography.labelMedium)
         Spacer(Modifier.height(2.dp))
         Box {
-            OutlinedButton(onClick = { expanded = true }) {
+            // The visible label sits in a sibling Text, so on its own this
+            // button announces just its value ("3") with no idea what it sets.
+            OutlinedButton(
+                onClick = { expanded = true },
+                modifier = Modifier.semantics {
+                    contentDescription = "$label: $selected. Double tap to change."
+                },
+            ) {
                 Text(selected.toString().replaceFirstChar { it.uppercase() })
             }
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
