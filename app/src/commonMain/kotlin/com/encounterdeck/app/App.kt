@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -113,8 +114,11 @@ private fun EncounterScreen() {
         }
     }
 
+    // Cap the content width so a 13-inch iPad shows a readable centred column
+    // rather than controls stretched across the full screen.
+    Box(Modifier.fillMaxSize().safeContentPadding(), contentAlignment = Alignment.TopCenter) {
     Column(
-        Modifier.fillMaxSize().safeContentPadding().padding(horizontal = 16.dp, vertical = 8.dp),
+        Modifier.widthIn(max = 640.dp).fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text("EncounterDeck", style = MaterialTheme.typography.headlineSmall)
@@ -167,6 +171,7 @@ private fun EncounterScreen() {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
+    }
     }
 }
 
