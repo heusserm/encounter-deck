@@ -62,7 +62,8 @@ xcodebuild -exportArchive \
 
 The export options use `method: app-store-connect`. Upload the resulting `.ipa`
 with **Transporter** (`/Applications/Transporter.app`), or `xcrun altool` with
-an app-specific password. Apple ID is **the Apple ID recorded in STATUS.md**.
+an app-specific password. The Apple ID is recorded in
+`~/Code/AppStoreListings/STATUS.md`, deliberately not repeated in a public repo.
 
 ## Traps
 
