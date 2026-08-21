@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -53,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.encounterdeck.engine.Difficulty
 import com.encounterdeck.engine.EncounterCard
@@ -91,6 +93,26 @@ private const val SRD_ATTRIBUTION =
 private val DIFFICULTIES = listOf("explorer", "balanced", "tactician", "honour")
 private val LOCATIONS = listOf("any", "castle", "dungeon", "woods", "trail", "mountains", "water", "north", "desert")
 private val TYPES = listOf("wandering", "big bad")
+
+/**
+ * The bundled drawing for [monster], tinted to the theme.
+ *
+ * The art ships as a transparent alpha mask rather than a picture, so tinting
+ * is what gives it a colour at all. Renders nothing when no drawing is bundled
+ * -- roughly half the monsters have none, and a repeated placeholder would say
+ * less than the text that is already there.
+ */
+@Composable
+private fun MonsterArt(monster: Monster, modifier: Modifier, tint: Color) {
+    val art = artFor(monster) ?: return
+    Image(
+        painter = painterResource(art),
+        contentDescription = null,   // the monster's name is always adjacent
+        modifier = modifier,
+        contentScale = ContentScale.Fit,
+        colorFilter = ColorFilter.tint(tint),
+    )
+}
 
 /** The SRD notice. Required wherever SRD-derived content is on screen. */
 @Composable
@@ -297,8 +319,20 @@ private fun CardContent(card: EncounterCard) {
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        // A solo Big Bad gets the room; a mixed group shares the card, so the
+        // art shrinks rather than pushing the stats off the bottom.
+        val artHeight = if (card.groups.size == 1) 150.dp else 104.dp
+
         card.groups.forEach { group ->
             val m = group.monster
+            if (artFor(m) != null) {
+                MonsterArt(
+                    m,
+                    Modifier.fillMaxWidth().height(artHeight),
+                    MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.height(6.dp))
+            }
             Text(
                 countLabel(m.name, group.count),
                 style = MaterialTheme.typography.headlineSmall,
@@ -516,15 +550,7 @@ private fun MonsterRow(m: Monster, onClick: () -> Unit) {
         // A fixed-width slot either way, so names line up whether or not this
         // monster has art bundled.
         Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) {
-            artFor(m)?.let { art ->
-                Image(
-                    painter = painterResource(art),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Fit,
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
-                )
-            }
+            MonsterArt(m, Modifier.fillMaxSize(), MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Spacer(Modifier.width(12.dp))
         Column {
@@ -556,15 +582,11 @@ private fun ColumnScope.MonsterDetail(m: Monster, onBack: () -> Unit) {
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // The art is a transparent alpha mask, so it takes the theme's
-            // colour rather than shipping a white plate into a dark UI.
-            artFor(m)?.let { art ->
-                Image(
-                    painter = painterResource(art),
-                    contentDescription = null,   // the name is right below it
-                    modifier = Modifier.fillMaxWidth().height(180.dp),
-                    contentScale = ContentScale.Fit,
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+            if (artFor(m) != null) {
+                MonsterArt(
+                    m,
+                    Modifier.fillMaxWidth().height(180.dp),
+                    MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(Modifier.height(10.dp))
             }
