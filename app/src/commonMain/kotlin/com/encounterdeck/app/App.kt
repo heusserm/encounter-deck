@@ -182,6 +182,16 @@ fun App() {
                         Tab.ENCOUNTER -> EncounterScreen { showAbout = true }
                         Tab.BESTIARY -> BestiaryScreen { showAbout = true }
                     }
+
+                    // Nothing read showAbout for three releases: every SrdNotice
+                    // set it, and no one rendered the dialog, so the licence text
+                    // the strip stands in for could not be reached at all. That
+                    // is a compliance problem as much as a UI one -- CC-BY-4.0
+                    // 3(a)(2) lets the notice live behind a link, but only a link
+                    // that opens.
+                    if (showAbout) {
+                        AboutDialog(onDismiss = { showAbout = false })
+                    }
                 }
             }
         }

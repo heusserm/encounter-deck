@@ -33,6 +33,16 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
         }
+        // The app module had no tests at all, and it shipped a dead About
+        // dialog through three releases because of it. These run the real
+        // composables on the desktop target -- no device, no simulator.
+        val desktopTest by getting
+        desktopTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(compose.desktop.currentOs)
+            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+            implementation(compose.uiTest)
+        }
     }
 }
 

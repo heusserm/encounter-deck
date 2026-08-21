@@ -41,7 +41,7 @@ more to load than the scan costs to run, and it would drag a dependency into
 Requires **JDK 21**. Android needs the Android SDK; iOS needs Xcode.
 
 ```bash
-./gradlew :engine:jvmTest :backend:test    # the test suite
+./gradlew :engine:jvmTest :backend:test :app:desktopTest    # the test suite
 ./gradlew :app:run                         # desktop app
 ./gradlew :backend:run                     # optional API, port 8080
 ./gradlew :app:assembleDebug               # Android APK
@@ -90,6 +90,18 @@ there is nothing to re-export from.
 **Transporter shows a blank icon thumbnail** even when the icon is correct.
 That is not a signal — verify with `unzip` + `PlistBuddy` instead.
 
+**A composable that nothing calls is silent, not broken-looking.** `AboutDialog`
+existed, `SrdNotice` was clickable on all three screens, and every one of them
+set `showAbout` — but nothing ever read it, so the dialog was never composed
+and the licence text behind the link was unreachable for three releases. It
+looked wired at every point you would think to check. `AboutDialogTest` now
+opens it and asserts the attribution appears, and all three of its cases fail
+if the render is removed again.
+
+That is also why `app/` has tests now: it had none, which is precisely how a
+dead feature shipped. The suite is `:engine:jvmTest :backend:test
+:app:desktopTest`.
+
 **`Scaffold` already supplies the system-bar insets.** It hands each screen a
 `padding` value; a screen that also calls `safeContentPadding()` insets twice
 and leaves a dead band under the status bar. This was live for a while and is
@@ -123,12 +135,12 @@ reasons, so do not "fix" a missing monster by deleting that list.
 ## Status
 
 Phases 0–2 complete: engine + backend + Compose app on Android, iOS and
-desktop. 1.0 shipped to the App Store; `Info.plist` sits at 1.0.1 (2),
-committed.
+desktop. 1.0 shipped to the App Store; `Info.plist` now sits at **1.1.0 (3)**,
+committed and not yet uploaded.
 
 The bestiary and its artwork landed after 1.0.1 and have **not** shipped to the
-App Store yet, so the next upload needs a fresh version/build bump per the trap
-above.
+App Store, which is what 1.1.0 is for. Bump the build again before any
+*subsequent* upload — Apple rejects a `CFBundleVersion` it has already seen.
 
 Working-tree state does not belong in this file -- `git status` is always more
 current than a note here.
