@@ -2,9 +2,11 @@ package com.encounterdeck.app
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,15 +16,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
@@ -48,9 +57,13 @@ import com.encounterdeck.engine.EncounterRequest
 import com.encounterdeck.engine.EncounterType
 import com.encounterdeck.engine.InMemoryMonsterRepository
 import com.encounterdeck.engine.Location
+import com.encounterdeck.engine.Monster
 import com.encounterdeck.engine.MonsterGroup
+import com.encounterdeck.engine.MonsterSearch
+import com.encounterdeck.engine.SearchScope
 import com.encounterdeck.engine.Treasure
 import com.encounterdeck.engine.countLabel
+import com.encounterdeck.engine.formatCr
 import kotlinx.coroutines.launch
 import kotlin.math.round
 
@@ -69,11 +82,38 @@ private val DIFFICULTIES = listOf("explorer", "balanced", "tactician", "honour")
 private val LOCATIONS = listOf("any", "castle", "dungeon", "woods", "trail", "mountains", "water", "north", "desert")
 private val TYPES = listOf("wandering", "big bad")
 
+/** The app's top-level destinations. */
+private enum class Tab(val label: String) { ENCOUNTER("Encounter"), BESTIARY("Bestiary") }
+
 @Composable
 fun App() {
     MaterialTheme(colorScheme = darkColorScheme()) {
+        var tab by remember { mutableStateOf(Tab.ENCOUNTER) }
         Surface(Modifier.fillMaxSize()) {
-            EncounterScreen()
+            Scaffold(
+                bottomBar = {
+                    NavigationBar {
+                        Tab.entries.forEach { t ->
+                            NavigationBarItem(
+                                selected = tab == t,
+                                onClick = { tab = t },
+                                // Icon-less bar: the label is the only affordance,
+                                // so it always shows rather than only when selected.
+                                icon = {},
+                                label = { Text(t.label) },
+                                alwaysShowLabel = true,
+                            )
+                        }
+                    }
+                },
+            ) { padding ->
+                Box(Modifier.padding(padding)) {
+                    when (tab) {
+                        Tab.ENCOUNTER -> EncounterScreen()
+                        Tab.BESTIARY -> BestiaryScreen()
+                    }
+                }
+            }
         }
     }
 }
@@ -331,13 +371,6 @@ private fun immunitiesLine(group: MonsterGroup): String? {
     return if (parts.isEmpty()) null else parts.joinToString("\n")
 }
 
-private fun formatCr(cr: Double): String = when (cr) {
-    0.125 -> "1/8"
-    0.25 -> "1/4"
-    0.5 -> "1/2"
-    else -> cr.toInt().toString()
-}
-
 private fun formatPower(power: Double): String {
     val rounded = round(power * 100) / 100.0
     return rounded.toString()
@@ -352,4 +385,225 @@ private fun formatTreasure(t: Treasure): String {
         if (t.cp > 0) add("${t.cp} cp")
     }
     return if (parts.isEmpty()) "none" else parts.joinToString(", ")
+}
+
+// ---------------------------------------------------------------- bestiary --
+
+@Composable
+private fun BestiaryScreen() {
+    val search = remember { MonsterSearch() }
+
+    var query by remember { mutableStateOf("") }
+    var scope by remember { mutableStateOf(SearchScope.EVERYTHING) }
+    var selected by remember { mutableStateOf<Monster?>(null) }
+    // Suggestions drop away once a result is opened, and while browsing results.
+    var showSuggestions by remember { mutableStateOf(false) }
+
+    val results = remember(query, scope) { search.search(query, scope) }
+    val suggestions = remember(query) { search.suggest(query) }
+
+    Box(Modifier.fillMaxSize().safeContentPadding(), contentAlignment = Alignment.TopCenter) {
+        Column(
+            Modifier.widthIn(max = 640.dp).fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            selected?.let { monster ->
+                MonsterDetail(monster) { selected = null }
+                return@Column
+            }
+
+            OutlinedTextField(
+                value = query,
+                onValueChange = {
+                    query = it
+                    showSuggestions = true
+                },
+                singleLine = true,
+                label = { Text("Search monsters") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(Modifier.height(6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SearchScope.entries.forEach { s ->
+                    FilterChip(
+                        selected = scope == s,
+                        onClick = { scope = s },
+                        label = { Text(if (s == SearchScope.NAME) "Name" else "Everything") },
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Type-ahead: tapping a suggestion opens that monster directly.
+            if (showSuggestions && suggestions.isNotEmpty() && query.isNotBlank()) {
+                Surface(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    tonalElevation = 4.dp,
+                ) {
+                    Column {
+                        suggestions.forEach { m ->
+                            Text(
+                                m.name,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        selected = m
+                                        showSuggestions = false
+                                    }
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+
+            Text(
+                when {
+                    query.isBlank() -> "${results.size} monsters"
+                    results.isEmpty() -> "No monsters match \"$query\""
+                    else -> "${results.size} ${if (results.size == 1) "match" else "matches"}"
+                },
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(6.dp))
+
+            LazyColumn(Modifier.fillMaxWidth().weight(1f)) {
+                items(results, key = { it.id }) { m ->
+                    MonsterRow(m) {
+                        selected = m
+                        showSuggestions = false
+                    }
+                    HorizontalDivider()
+                }
+            }
+
+            Text(
+                SRD_ATTRIBUTION,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun MonsterRow(m: Monster, onClick: () -> Unit) {
+    Column(
+        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 10.dp, horizontal = 4.dp),
+    ) {
+        Text(m.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(2.dp))
+        Text(
+            "CR ${formatCr(m.cr)}  •  ${m.size} ${m.type}  •  AC ${m.ac}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.MonsterDetail(m: Monster, onBack: () -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        OutlinedButton(onClick = onBack) { Text("‹ Back") }
+    }
+    Spacer(Modifier.height(10.dp))
+
+    Surface(
+        Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(20.dp)),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 6.dp,
+        shadowElevation = 10.dp,
+    ) {
+        Column(
+            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                m.name,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "CR ${formatCr(m.cr)}   •   ${m.xp} XP",
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text("${m.size} ${m.type}", style = MaterialTheme.typography.bodyMedium)
+
+            Spacer(Modifier.height(12.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(12.dp))
+
+            Text("AC ${m.ac}", style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(2.dp))
+            Text(
+                "HP ${m.hitDice.average}  (${m.hitDice})",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
+            m.armor?.let {
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    "Armor: $it (lootable)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            if (m.damageImmunities.isNotEmpty() || m.conditionImmunities.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                if (m.damageImmunities.isNotEmpty()) {
+                    Text(
+                        "Immune (damage): ${m.damageImmunities.joinToString(", ")}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                if (m.conditionImmunities.isNotEmpty()) {
+                    Text(
+                        "Immune (condition): ${m.conditionImmunities.joinToString(", ")}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+
+            if (m.attacks.isNotEmpty()) {
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider()
+                Spacer(Modifier.height(10.dp))
+                Text("Attacks", style = MaterialTheme.typography.titleSmall)
+                Spacer(Modifier.height(4.dp))
+                m.attacks.forEach { attack ->
+                    Text(
+                        "• $attack",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp),
+                    )
+                }
+            }
+
+            if (m.locations.isNotEmpty()) {
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    "Found in: ${m.locations.map { it.name.lowercase() }.sorted().joinToString(", ")}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
+    }
+    Spacer(Modifier.height(8.dp))
 }
