@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -33,6 +34,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.foundation.Image
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
@@ -44,7 +46,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -64,6 +68,7 @@ import com.encounterdeck.engine.SearchScope
 import com.encounterdeck.engine.Treasure
 import com.encounterdeck.engine.countLabel
 import com.encounterdeck.engine.formatCr
+import org.jetbrains.compose.resources.painterResource
 import kotlinx.coroutines.launch
 import kotlin.math.round
 
@@ -495,16 +500,33 @@ private fun BestiaryScreen() {
 
 @Composable
 private fun MonsterRow(m: Monster, onClick: () -> Unit) {
-    Column(
+    Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 10.dp, horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(m.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(2.dp))
-        Text(
-            "CR ${formatCr(m.cr)}  •  ${m.size} ${m.type}  •  AC ${m.ac}",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        // A fixed-width slot either way, so names line up whether or not this
+        // monster has art bundled.
+        Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) {
+            artFor(m)?.let { art ->
+                Image(
+                    painter = painterResource(art),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
+                )
+            }
+        }
+        Spacer(Modifier.width(12.dp))
+        Column {
+            Text(m.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(2.dp))
+            Text(
+                "CR ${formatCr(m.cr)}  •  ${m.size} ${m.type}  •  AC ${m.ac}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
@@ -525,6 +547,19 @@ private fun ColumnScope.MonsterDetail(m: Monster, onBack: () -> Unit) {
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            // The art is a transparent alpha mask, so it takes the theme's
+            // colour rather than shipping a white plate into a dark UI.
+            artFor(m)?.let { art ->
+                Image(
+                    painter = painterResource(art),
+                    contentDescription = null,   // the name is right below it
+                    modifier = Modifier.fillMaxWidth().height(180.dp),
+                    contentScale = ContentScale.Fit,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+                )
+                Spacer(Modifier.height(10.dp))
+            }
+
             Text(
                 m.name,
                 style = MaterialTheme.typography.headlineSmall,

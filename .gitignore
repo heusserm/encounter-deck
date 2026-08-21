@@ -19,3 +19,4 @@ iosApp/build/
 
 # Generated data cache
 scripts/monsters.json
+__pycache__/
