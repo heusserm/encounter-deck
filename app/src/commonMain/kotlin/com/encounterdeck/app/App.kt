@@ -77,15 +77,32 @@ private const val ATTRIBUTION =
         "Not affiliated with, endorsed by, or sponsored by any game publisher."
 
 // CC-BY-4.0 requires this notice to travel with the distributed work, so it
-// ships in the app rather than only in the repository README.
+// ships in the app rather than only in the repository README. Section
+// 3(a)(1)(B) also requires saying that the material was modified -- and it was:
+// gen_seed.py abridges the stat blocks, reconstructs hit dice from average hit
+// points, and adds environment tags that are not SRD content at all.
 private const val SRD_ATTRIBUTION =
     "This work includes material from the System Reference Document 5.1 (\"SRD 5.1\") " +
         "by Wizards of the Coast LLC, available under the Creative Commons Attribution " +
-        "4.0 International License (https://creativecommons.org/licenses/by/4.0/legalcode)."
+        "4.0 International License (https://creativecommons.org/licenses/by/4.0/legalcode). " +
+        "Modified from the original: stat blocks are abridged, hit dice are reconstructed " +
+        "from average hit points, and environment tags are ours."
 
 private val DIFFICULTIES = listOf("explorer", "balanced", "tactician", "honour")
 private val LOCATIONS = listOf("any", "castle", "dungeon", "woods", "trail", "mountains", "water", "north", "desert")
 private val TYPES = listOf("wandering", "big bad")
+
+/** The SRD notice. Required wherever SRD-derived content is on screen. */
+@Composable
+private fun SrdNotice(modifier: Modifier = Modifier) {
+    Text(
+        SRD_ATTRIBUTION,
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+        modifier = modifier,
+    )
+}
 
 /** The app's top-level destinations. */
 private enum class Tab(val label: String) { ENCOUNTER("Encounter"), BESTIARY("Bestiary") }
@@ -212,12 +229,7 @@ private fun EncounterScreen() {
         }
 
         Spacer(Modifier.height(8.dp))
-        Text(
-            SRD_ATTRIBUTION,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
+        SrdNotice()
     }
     }
 }
@@ -412,8 +424,10 @@ private fun BestiaryScreen() {
             Modifier.widthIn(max = 640.dp).fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            selected?.let { monster ->
+            val monster = selected
+            if (monster != null) {
                 MonsterDetail(monster) { selected = null }
+                SrdNotice()
                 return@Column
             }
 
@@ -488,12 +502,7 @@ private fun BestiaryScreen() {
                 }
             }
 
-            Text(
-                SRD_ATTRIBUTION,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
+            SrdNotice()
         }
     }
 }

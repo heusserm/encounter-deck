@@ -163,10 +163,18 @@ publisher. It is an independent play aid for 5e-compatible games.
 > This work includes material from the System Reference Document 5.1 ("SRD 5.1")
 > by Wizards of the Coast LLC, available under the Creative Commons Attribution
 > 4.0 International License
-> (<https://creativecommons.org/licenses/by/4.0/legalcode>).
+> (<https://creativecommons.org/licenses/by/4.0/legalcode>). Modified from the
+> original: stat blocks are abridged, hit dice are reconstructed from average
+> hit points, and environment tags are ours.
 
 Monster data was imported from the community SRD dataset at
-<https://github.com/5e-bits/5e-database> (also SRD 5.1 under CC-BY-4.0).
+<https://github.com/5e-bits/5e-database> (also SRD 5.1 under CC-BY-4.0). The
+"modified" sentence is not decoration -- CC-BY-4.0 section 3(a)(1)(B) requires
+indicating that the material was changed, and `scripts/gen_seed.py` does change
+it. The notice ships on every screen that shows SRD-derived content.
+
+Bundled artwork is *not* SRD content and is separately public domain or CC0;
+see [ART.md](ART.md).
 
 Note: SRD content (used here under CC-BY-4.0) is distinct from the
 [PolyForm Noncommercial](LICENSE) terms below, which cover **this project's own
