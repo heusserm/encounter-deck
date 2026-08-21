@@ -278,9 +278,11 @@ private fun EncounterScreen(onAbout: () -> Unit) {
 @Composable
 private fun <T> LabeledDropdown(label: String, options: List<T>, selected: T, onSelect: (T) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, style = MaterialTheme.typography.labelMedium)
-        Spacer(Modifier.height(2.dp))
+    // Label beside the control rather than above it: two rows of these used to
+    // cost four lines of vertical space, and the card is what people came for.
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(label, style = MaterialTheme.typography.labelSmall)
+        Spacer(Modifier.width(6.dp))
         Box {
             // The visible label sits in a sibling Text, so on its own this
             // button announces just its value ("3") with no idea what it sets.
@@ -340,7 +342,7 @@ private fun CardContent(card: EncounterCard) {
     ) {
         // A solo Big Bad gets the room; a mixed group shares the card, so the
         // art shrinks rather than pushing the stats off the bottom.
-        val artHeight = if (card.groups.size == 1) 150.dp else 104.dp
+        val artHeight = if (card.groups.size == 1) 75.dp else 52.dp
 
         card.groups.forEach { group ->
             val m = group.monster
