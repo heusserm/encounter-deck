@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -34,6 +34,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TextButton
 import androidx.compose.foundation.Image
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
@@ -114,15 +115,39 @@ private fun MonsterArt(monster: Monster, modifier: Modifier, tint: Color) {
     )
 }
 
-/** The SRD notice. Required wherever SRD-derived content is on screen. */
+/**
+ * One-line licence strip. Required on every screen showing SRD-derived content.
+ *
+ * CC-BY-4.0 3(a)(2) lets the required notice live behind a link rather than
+ * beside the work, so the full text sits in [AboutDialog] and this names the
+ * source, the licence and the fact it was modified. Six lines of legal text on
+ * a phone left the encounter card a strip; this is one line.
+ */
 @Composable
-private fun SrdNotice(modifier: Modifier = Modifier) {
+private fun SrdNotice(onOpen: () -> Unit, modifier: Modifier = Modifier) {
     Text(
-        SRD_ATTRIBUTION,
+        "SRD 5.1 · CC BY 4.0 · modified · About",
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
-        modifier = modifier,
+        modifier = modifier.clickable(onClick = onOpen).padding(vertical = 4.dp, horizontal = 8.dp),
+    )
+}
+
+/** The full attribution text, which the one-line strip stands in for. */
+@Composable
+private fun AboutDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = { TextButton(onClick = onDismiss) { Text("Close") } },
+        title = { Text("About EncounterDeck") },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text(ATTRIBUTION, style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(12.dp))
+                Text(SRD_ATTRIBUTION, style = MaterialTheme.typography.bodySmall)
+            }
+        },
     )
 }
 
@@ -133,6 +158,7 @@ private enum class Tab(val label: String) { ENCOUNTER("Encounter"), BESTIARY("Be
 fun App() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         var tab by remember { mutableStateOf(Tab.ENCOUNTER) }
+        var showAbout by remember { mutableStateOf(false) }
         Surface(Modifier.fillMaxSize()) {
             Scaffold(
                 bottomBar = {
@@ -153,8 +179,8 @@ fun App() {
             ) { padding ->
                 Box(Modifier.padding(padding)) {
                     when (tab) {
-                        Tab.ENCOUNTER -> EncounterScreen()
-                        Tab.BESTIARY -> BestiaryScreen()
+                        Tab.ENCOUNTER -> EncounterScreen { showAbout = true }
+                        Tab.BESTIARY -> BestiaryScreen { showAbout = true }
                     }
                 }
             }
@@ -163,7 +189,7 @@ fun App() {
 }
 
 @Composable
-private fun EncounterScreen() {
+private fun EncounterScreen(onAbout: () -> Unit) {
     val generator = remember { EncounterGenerator(InMemoryMonsterRepository()) }
     val scope = rememberCoroutineScope()
 
@@ -202,41 +228,34 @@ private fun EncounterScreen() {
 
     // Cap the content width so a 13-inch iPad shows a readable centred column
     // rather than controls stretched across the full screen.
-    Box(Modifier.fillMaxSize().safeContentPadding(), contentAlignment = Alignment.TopCenter) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
     Column(
-        Modifier.widthIn(max = 640.dp).fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
+        Modifier.widthIn(max = 640.dp).fillMaxSize().padding(horizontal = 16.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("EncounterDeck", style = MaterialTheme.typography.headlineSmall)
-        Spacer(Modifier.height(2.dp))
-        Text(
-            ATTRIBUTION,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(10.dp))
+        Text("EncounterDeck", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(6.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LabeledDropdown("Level", (1..10).toList(), level) { level = it }
             LabeledDropdown("Players", (1..8).toList(), players) { players = it }
         }
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(4.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LabeledDropdown("Difficulty", DIFFICULTIES, difficulty) { difficulty = it }
             LabeledDropdown("Location", LOCATIONS, location) { location = it }
         }
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(4.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LabeledDropdown("Type", TYPES, type) { type = it }
         }
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(8.dp))
         Button(onClick = { generate() }, enabled = !busy) {
             Text(if (busy) "Generating…" else "Generate")
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(8.dp))
         Box(
             Modifier
                 .fillMaxWidth()
@@ -250,8 +269,8 @@ private fun EncounterScreen() {
             CardFace(card, error)
         }
 
-        Spacer(Modifier.height(8.dp))
-        SrdNotice()
+        Spacer(Modifier.height(4.dp))
+        SrdNotice(onAbout)
     }
     }
 }
@@ -441,7 +460,7 @@ private fun formatTreasure(t: Treasure): String {
 // ---------------------------------------------------------------- bestiary --
 
 @Composable
-private fun BestiaryScreen() {
+private fun BestiaryScreen(onAbout: () -> Unit) {
     val search = remember { MonsterSearch() }
 
     var query by remember { mutableStateOf("") }
@@ -453,7 +472,7 @@ private fun BestiaryScreen() {
     val results = remember(query, scope) { search.search(query, scope) }
     val suggestions = remember(query) { search.suggest(query) }
 
-    Box(Modifier.fillMaxSize().safeContentPadding(), contentAlignment = Alignment.TopCenter) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Column(
             Modifier.widthIn(max = 640.dp).fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -461,7 +480,7 @@ private fun BestiaryScreen() {
             val monster = selected
             if (monster != null) {
                 MonsterDetail(monster) { selected = null }
-                SrdNotice()
+                SrdNotice(onAbout)
                 return@Column
             }
 
@@ -536,7 +555,7 @@ private fun BestiaryScreen() {
                 }
             }
 
-            SrdNotice()
+            SrdNotice(onAbout)
         }
     }
 }

@@ -90,6 +90,11 @@ there is nothing to re-export from.
 **Transporter shows a blank icon thumbnail** even when the icon is correct.
 That is not a signal — verify with `unzip` + `PlistBuddy` instead.
 
+**`Scaffold` already supplies the system-bar insets.** It hands each screen a
+`padding` value; a screen that also calls `safeContentPadding()` insets twice
+and leaves a dead band under the status bar. This was live for a while and is
+easy to reintroduce when adding a tab.
+
 **Keep `engine/` framework-free.** It is compiled for JVM, Android and iOS and
 consumed unchanged by the backend and the app. Adding a dependency there costs
 you on three platforms.
@@ -99,6 +104,10 @@ Identity, no closed or edition-specific content. The attribution is a license
 requirement and ships on **every screen showing SRD-derived content** — the
 encounter card, the bestiary list, and the monster detail view — via the single
 `SrdNotice` composable. Add a screen that shows monster data, add the notice.
+On screen it is one line that opens `AboutDialog`; CC-BY-4.0 3(a)(2) allows the
+required text to sit behind a link, and the full six lines inline left the
+encounter card a strip on a phone. Shortening it is fine, dropping the link is
+not.
 It also states that the material was modified, which CC-BY-4.0 3(a)(1)(B)
 requires because `gen_seed.py` abridges stat blocks, reconstructs hit dice, and
 invents the location tags. Do not remove or reword it without reading the
