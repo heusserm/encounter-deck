@@ -99,7 +99,7 @@ private val TYPES = listOf("wandering", "big bad")
  * The bundled drawing for [monster], tinted to the theme.
  *
  * The art ships as a transparent alpha mask rather than a picture, so tinting
- * is what gives it a colour at all. Renders nothing when no drawing is bundled
+ * is what gives it a color at all. Renders nothing when no drawing is bundled
  * -- roughly half the monsters have none, and a repeated placeholder would say
  * less than the text that is already there.
  */
@@ -116,11 +116,11 @@ private fun MonsterArt(monster: Monster, modifier: Modifier, tint: Color) {
 }
 
 /**
- * One-line licence strip. Required on every screen showing SRD-derived content.
+ * One-line license strip. Required on every screen showing SRD-derived content.
  *
  * CC-BY-4.0 3(a)(2) lets the required notice live behind a link rather than
  * beside the work, so the full text sits in [AboutDialog] and this names the
- * source, the licence and the fact it was modified. Six lines of legal text on
+ * source, the license and the fact it was modified. Six lines of legal text on
  * a phone left the encounter card a strip; this is one line.
  */
 @Composable
@@ -184,7 +184,7 @@ fun App() {
                     }
 
                     // Nothing read showAbout for three releases: every SrdNotice
-                    // set it, and no one rendered the dialog, so the licence text
+                    // set it, and no one rendered the dialog, so the license text
                     // the strip stands in for could not be reached at all. That
                     // is a compliance problem as much as a UI one -- CC-BY-4.0
                     // 3(a)(2) lets the notice live behind a link, but only a link
@@ -236,7 +236,7 @@ private fun EncounterScreen(onAbout: () -> Unit) {
         }
     }
 
-    // Cap the content width so a 13-inch iPad shows a readable centred column
+    // Cap the content width so a 13-inch iPad shows a readable centered column
     // rather than controls stretched across the full screen.
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
     Column(

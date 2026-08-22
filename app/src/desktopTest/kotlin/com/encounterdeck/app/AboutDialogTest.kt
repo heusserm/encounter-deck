@@ -10,7 +10,7 @@ import kotlin.test.Test
  * The SRD strip has to open the full attribution, on every screen that shows
  * SRD-derived content.
  *
- * This is a licence requirement, not a nicety. CC-BY-4.0 3(a)(2) allows the
+ * This is a license requirement, not a nicety. CC-BY-4.0 3(a)(2) allows the
  * required notice to live behind a link rather than beside the work, which is
  * the whole reason the six lines were reduced to one — but only a link that
  * opens qualifies. For three releases nothing rendered the dialog: every
@@ -33,7 +33,7 @@ class AboutDialogTest {
     }
 
     @Test
-    fun `the attribution names the licence and says the work was modified`() = runComposeUiTest {
+    fun `the attribution names the license and says the work was modified`() = runComposeUiTest {
         setContent { App() }
 
         onNodeWithText(SRD_STRIP).performClick()
