@@ -51,6 +51,40 @@ cd iosApp && xcodegen generate             # after editing iosApp/project.yml
 For iOS, open `iosApp/iosApp.xcodeproj` in Xcode and Run. The build compiles
 the shared Kotlin framework automatically via a pre-build script phase.
 
+### Running it in a simulator without Xcode
+
+Layout bugs on a phone are invisible on desktop -- the encounter card was
+squeezed to a strip for a while and `./gradlew :app:run` looked fine throughout.
+Check phone layout on a phone.
+
+```bash
+xcrun simctl list devices available          # pick a UDID
+xcrun simctl boot <UDID>; open -a Simulator
+
+xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp \
+  -configuration Debug -destination "platform=iOS Simulator,id=<UDID>" \
+  -derivedDataPath build/dd build           # ~2 min cold, seconds warm
+
+xcrun simctl install <UDID> build/dd/Build/Products/Debug-iphonesimulator/EncounterDeck.app
+xcrun simctl launch  <UDID> com.encounterdeck.app
+xcrun simctl io <UDID> screenshot shot.png  # then actually look at it
+```
+
+Reinstalling over a running app can fail to launch; `simctl terminate` first, or
+just install, sleep a second, then launch. `build/dd` is under the ignored
+`build/`, so it does not need cleaning up.
+
+**Screenshots must come from `simctl io`.** Plain `screencapture` returns a
+black frame unless the terminal has macOS Screen Recording permission, and a
+black PNG looks exactly like a failed launch.
+
+To tap, map fractional device coordinates onto the Simulator window --
+`cliclick` plus the window rect from System Events. The window is the device
+screen plus a ~28px title bar and small side margins, so derive the screen rect
+from the window size and the device aspect ratio rather than assuming they are
+the same. Activate the Simulator first or the click goes to whatever is
+frontmost.
+
 ## Shipping a build to the App Store
 
 **This is not Flutter.** It needs an explicit two-step archive then export, and
@@ -101,6 +135,19 @@ if the render is removed again.
 That is also why `app/` has tests now: it had none, which is precisely how a
 dead feature shipped. The suite is `:engine:jvmTest :backend:test
 :app:desktopTest`.
+
+**Python here has no CA bundle**, so `urllib`/`requests` fail every HTTPS call
+with `CERTIFICATE_VERIFY_FAILED`. Shell out to `curl` instead. Relevant if you
+extend the artwork: Wikimedia also returns **429** under any real download rate
+(back off and stay backed off -- a fixed sleep is not enough), and only serves
+thumbnails at its own set of widths, so take the `thumburl` the API hands back
+rather than building a `500px-` URL yourself.
+
+**For a throwaway check against the engine**, compile against the built jar
+rather than adding a test you will delete:
+`/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc`
+with `-cp engine/build/libs/engine-jvm.jar`. Useful for measuring search
+behaviour or timings over the real 334-monster corpus.
 
 **`Scaffold` already supplies the system-bar insets.** It hands each screen a
 `padding` value; a screen that also calls `safeContentPadding()` insets twice
