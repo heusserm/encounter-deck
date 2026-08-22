@@ -85,6 +85,20 @@ from the window size and the device aspect ratio rather than assuming they are
 the same. Activate the Simulator first or the click goes to whatever is
 frontmost.
 
+**A screenshot proves it drew, not that it works.** The dead About dialog above
+shipped past three rounds of simulator screenshots: the strip appeared in every
+one of them, looking exactly like a working link, and nobody pressed it.
+
+But press it with a **Compose UI test**, not with synthetic clicks. Coordinate
+tapping is reliable for something the size of the Generate button and unreliable
+below roughly 60px of device height -- a sweep across five positions spanning
+the whole SRD strip failed to open a dialog that `AboutDialogTest` opens every
+run, because the mapping from window to device screen carries an offset that
+big targets absorb and small ones do not. `onNodeWithText(...).performClick()`
+addresses the node, needs no geometry, and asserts on text the control itself
+does not contain. Use simulator taps to exercise a flow and see it; use a test
+to prove a control is wired.
+
 ## Shipping a build to the App Store
 
 **This is not Flutter.** It needs an explicit two-step archive then export, and
