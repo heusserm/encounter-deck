@@ -13,6 +13,15 @@ Kotlin engine, three front ends. Fully offline — no network calls at all.
 
 ---
 
+## House style
+
+**US English, not British.** Color, not colour. License, not licence. Behavior,
+center, organize, recognize. This applies to prose, code comments, identifiers,
+and anything the app puts on screen.
+
+The audience is American and the App Store listing is en-US; a page that says
+"colour" beside a US price reads as though it were written for somewhere else.
+
 ## Layout
 
 ```
@@ -141,7 +150,7 @@ That is not a signal — verify with `unzip` + `PlistBuddy` instead.
 **A composable that nothing calls is silent, not broken-looking.** `AboutDialog`
 existed, `SrdNotice` was clickable on all three screens, and every one of them
 set `showAbout` — but nothing ever read it, so the dialog was never composed
-and the licence text behind the link was unreachable for three releases. It
+and the license text behind the link was unreachable for three releases. It
 looked wired at every point you would think to check. `AboutDialogTest` now
 opens it and asserts the attribution appears, and all three of its cases fail
 if the render is removed again.
@@ -161,7 +170,7 @@ rather than building a `500px-` URL yourself.
 rather than adding a test you will delete:
 `/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc`
 with `-cp engine/build/libs/engine-jvm.jar`. Useful for measuring search
-behaviour or timings over the real 334-monster corpus.
+behavior or timings over the real 334-monster corpus.
 
 **`Scaffold` already supplies the system-bar insets.** It hands each screen a
 `padding` value; a screen that also calls `safeContentPadding()` insets twice
@@ -186,7 +195,7 @@ requires because `gen_seed.py` abridges stat blocks, reconstructs hit dice, and
 invents the location tags. Do not remove or reword it without reading the
 LICENSE section of README.md.
 
-**Bundled art is a separate licence story.** `app/src/commonMain/composeResources/`
+**Bundled art is a separate license story.** `app/src/commonMain/composeResources/`
 holds 65 public-domain/CC0 drawings; ART.md records each one. None requires
 attribution, which is why the app credits no artist — keep it that way, because
 adding a CC-BY image would oblige a second notice. Regenerate the id-to-image
